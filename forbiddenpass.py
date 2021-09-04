@@ -5,7 +5,8 @@ import requests
 import argparse
 import sys
 import json
-
+import warnings
+warnings.filterwarnings("ignore")
 banner = r"""
 
 
@@ -35,6 +36,17 @@ parser.add_argument('-d', '--domains', action='store',
 parser.add_argument('-t', '--target', action='store',
                     help="domain to check",
                     metavar="site.com")
+
+
+parser.add_argument('-u', '--user', action='store',
+                    help="username",
+                    metavar="admin")
+
+
+parser.add_argument('-w', '--password', action='store',
+                    help="password",
+                    metavar="password")
+
 
 args = parser.parse_args()
 
@@ -71,9 +83,15 @@ def do_request(url: str, stream=False, path=None):
     try:
         for header in headers:
             if stream:
-                r = requests.get(url, stream=True, headers=header)
+                if args.user:
+                    r = requests.get(url, stream=True, headers=header,verify=False, auth=(args.user,args.password))
+                else:
+                    r = requests.get(url, stream=True, headers=header,verify=False)
             else:
-                r = requests.get(url, headers=header)
+                if args.user:
+                    r = requests.get(url, headers=header,verify=False, auth=(args.user,args.password))
+                else:
+                    r = requests.get(url, headers=header,verify=False)
             print(Fore.WHITE + url + ' ' + json.dumps(list(header.items())[-1]) + Fore.GREEN + " [{}]".format(r.status_code))
     except requests.exceptions.ConnectionError as ce_error:
         print("Connection Error: ", ce_error)
@@ -94,7 +112,7 @@ def main():
             checklist = word_list(args.domains)
             for lines in checklist:
                 for bypass in bypass_list:
-                    links = lines + "/" + args.path + bypass
+                    links = lines + "/" + args.path + bypass                    
                     do_request(links, stream=True, path=args.path)
         else:
             print(Fore.CYAN + "Checking domains to bypass....")
@@ -108,6 +126,7 @@ def main():
             print(Fore.GREEN + f"Checking {args.target}...")
             for bypass in bypass_list:
                 links = args.target + "/" + args.path + bypass
+                links = args.target + "/" + bypass + args.path
                 do_request(links, path=args.path)
 
         else:

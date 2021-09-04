@@ -1,6 +1,10 @@
 # UPDATE 
 
-Thanks to Knowledge-Wisdom-Understanding (MrPMillz) for making the script cleaner and fixing the header payloads.
+August `21: Added new combinations of bypass + path to work with some challenges I was working on. 
+
+Supress warnings for ssl, and ignore ssl errors.
+
+Added basic authentication options --user --password
 
 # INSTALLATION
 
