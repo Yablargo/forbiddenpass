@@ -92,7 +92,11 @@ def do_request(url: str, stream=False, path=None):
                     r = requests.get(url, headers=header,verify=False, auth=(args.user,args.password))
                 else:
                     r = requests.get(url, headers=header,verify=False)
-            print(Fore.WHITE + url + ' ' + json.dumps(list(header.items())[-1]) + Fore.GREEN + " [{}]".format(r.status_code))
+                if r.status_code == 200:
+                    color = Fore.LIGHTYELLOW_EX
+                else:
+                    color = Fore.WHITE
+            print(color + url + ' ' + json.dumps(list(header.items())[-1]) + Fore.GREEN + " [{}]".format(r.status_code))
     except requests.exceptions.ConnectionError as ce_error:
         print("Connection Error: ", ce_error)
         pass
